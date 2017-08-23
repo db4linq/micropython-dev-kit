@@ -5,7 +5,7 @@ from machine import Pin, I2C
 import network, json
 from umqtt import MQTTClient
 import machine, ubinascii
-import errno, time
+import errno, time, gc
 
 client = None
 cfg = None
@@ -149,25 +149,10 @@ async def dth_read():
 
         await asyncio.sleep(5)
 
-
 btn1.irq(trigger=Pin.IRQ_FALLING, handler=btn_callback)
 btn2.irq(trigger=Pin.IRQ_FALLING, handler=btn_callback)
 loop.run_until_complete(wifi_config())
 loop.create_task(dth_read())
 loop.create_task(client_loop())
-
-def main():
-    try:
-        loop.run_forever()
-    except OSError as e:
-        oled.fill(0)
-        oled.text('ERROR', 45, 5)
-        oled.text('Restart system', 5, 20)
-        oled.show()
-        time.sleep(3)
-        main()
-if __name__ == '__main__':
-
-    main()
-
+loop.run_forever()
 
