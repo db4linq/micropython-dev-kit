@@ -20,8 +20,8 @@ oled.text('MicroPython', 20, 20)
 oled.show()
 
 wlan = network.WLAN(network.STA_IF)
-wlan.active(False)
-wlan.connect('see_dum', '0863219053')
+wlan.active(True)
+wlan.connect('<SSID>', '<PWD>')
 while not wlan.isconnected():
     print('wait connection')
     time.sleep(.5)
@@ -63,4 +63,4 @@ def loop(e):
     client.wait_msg()
 
 th.start_new_thread(loop, (None,))
-# th.start_new_thread(run, (1,)) 
+th.start_new_thread(run, (1,)) 
