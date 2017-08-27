@@ -5,6 +5,7 @@ import _thread as th
 import network
 from umqtt import MQTTClient
 import machine, ubinascii
+import _thread as th
 
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
 uart = UART(1, 9600)
@@ -19,7 +20,7 @@ oled.text('MicroPython', 20, 20)
 oled.show()
 
 wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
+wlan.active(False)
 wlan.connect('see_dum', '0863219053')
 while not wlan.isconnected():
     print('wait connection')
@@ -27,13 +28,14 @@ while not wlan.isconnected():
 print('WIFI Connected: ', wlan.ifconfig()[0])
 
 def on_message(topic, msg):
-    time.sleep(.5)
-    print(topic, msg)
+    print(topic.decode('utf-8'), msg.decode('utf-8'))
 
 client = MQTTClient( CLIENT_ID, '103.13.228.61', port=1883, keepalive=15)
 time.sleep(2)
 client.set_callback(on_message)
 client.connect()
+client.subscribe('/micro/switch/1')
+client.subscribe('/micro/switch/2')
 
 def run(e):
     while True:
@@ -56,4 +58,9 @@ def run(e):
         except OSError as e:
             print('Error: ', e)
         time.sleep(e)
-run(1) 
+
+def loop(e):
+    client.wait_msg()
+
+th.start_new_thread(loop, (None,))
+# th.start_new_thread(run, (1,)) 

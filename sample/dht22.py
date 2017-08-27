@@ -8,8 +8,12 @@ d = DHT22(dhtPn)
 tim0 = Timer(0)
 
 def callback():
-    d.measure()
-    print(d.temperature(), d.humidity()) 
+    try:
+        d.measure()
+        print(d.temperature(), d.humidity()) 
+    except OSError as e:
+        print('sensor read error')
+
 
 tim0.init(period=5000, mode=Timer.PERIODIC, callback=lambda t:callback())
 
