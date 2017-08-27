@@ -11,8 +11,10 @@ def callback():
     try:
         d.measure()
         print(d.temperature(), d.humidity()) 
+        
     except OSError as e:
         print('sensor read error')
+    time.sleep(2)
 
 
 tim0.init(period=5000, mode=Timer.PERIODIC, callback=lambda t:callback())
