@@ -3,7 +3,6 @@ import time, dht
 from machine import Pin
 import machine, ubinascii, gc, json
 import network
-machine.freq(160000000)
 gc.collect()
 CLIENT_ID = ubinascii.hexlify(machine.unique_id())
 d = None
@@ -41,9 +40,13 @@ def run():
     global oled 
     global CLIENT_ID    
     while True:
-        t, h = get_temperature()
-        msg =  json.dumps({ 'Heap': gc.mem_free(),  'Type':7, 'id': CLIENT_ID, 'temperature': '{0:.2f}'.format(t), 'humidity': '{0:.2f}'.format(h)})
-        print(msg)
-        client.publish('micro/{0}/temperature'.format(CLIENT_ID.decode("utf-8")), msg)
+        try:
+            t, h = get_temperature()
+            msg =  json.dumps({ 'Heap': gc.mem_free(),  'Type':7, 'id': CLIENT_ID, 'temperature': '{0:.2f}'.format(t), 'humidity': '{0:.2f}'.format(h)})
+            print(msg)
+            client.publish('micro/{0}/temperature'.format(CLIENT_ID.decode("utf-8")), msg)
+        except OSError as e:
+            if e.args[0] == errno.ETIMEDOUT:
+                print('error dht: ', e)
         time.sleep(5)
 setup()
